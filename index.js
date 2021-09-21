@@ -22,5 +22,34 @@ var T = new Twit({
         const tweets = data
         console.log(tweets)
     }
-    //Funcion de streaming para obtener datos mientras ejecuta la app
+
+    //Funcion de streaming para obtener datos mientras ejecuta la app.
+    var stream = T.stream('statuses/filter', { track: '#xiaomi'})
+    stream.on('tweet', function(tweet) {
+        console.log(tweet.text)
+        console.log('Lenguaje:' + franc(tweet.text))
+        console.log('----------')
+    })
+
+    //Obtener una muestra de status publicos
+    var stream = T.stream('statuses/sample')
+ 
+    stream.on('tweet', function (tweet) {
+    console.log(tweet)
+    })
+
+    //Monitorear tweets desde una ubicacion en concreto
+    var madrid = [ '-3.70', '40.41', '-3.50', '42.3' ]
+    var stream = T.stream('statuses/filter', { locations: madrid })
+    
+    stream.on('tweet', function(tweet){
+        console.log(tweet)
+    }) 
+
+    //Obtener unicamente twits con hashtag clave en idioma en especifico
+    var stream = T.stream('statuses/filter', { track: '#xiaomi', language: 'en' })
+ 
+    stream.on('tweet', function (tweet) {
+    console.log(tweet)
+    })
 })
