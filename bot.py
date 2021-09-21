@@ -32,3 +32,18 @@ class TweetsListener(tweepy.StreamListener):
 
     def on_error(self, status_code):
         print("Error", status_code)
+
+def get_twitter_api():
+    auth = tweepy.OAuthHandler(API_KEY, SECRET_KEY)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    apiTwitter = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+    return apiTwitter
+
+def run():
+    _streamClass = TweetsListener()
+    _apiTwitter = get_twitter_api()
+    streamingApi = tweepy.Stream(auth=_apiTwitter.auth, listener=_streamClass)
+    streamingApi.filter(follow=['2754746065'])
+
+if name == "main":
+    run()
