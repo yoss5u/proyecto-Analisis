@@ -1,6 +1,8 @@
 import json
 import os as _os
 import tweepy
+import mysql.connector
+from mysql.connector import Error
 from pymongo import MongoClient
 import dotenv as _dotenv
 _dotenv.load_dotenv()   
@@ -10,10 +12,47 @@ SECRET_KEY = _os.environ["TWITTER_API_SECRET_KEY"]
 ACCESS_TOKEN = _os.environ["TWITTER_ACCESS_TOKEN"]
 ACCESS_TOKEN_SECRET = _os.environ["TWITTER_ACCESS_TOKEN_TOKEN_SECRET"]
 DBSOURCEFINAL = _os.environ["MY_DB_ACCESS"]
+USER_DB = _os.environ["MY_USER_DB"]
+PASS_DB = _os.environ["MY_PASS_DB"]
+HOST_DB = _os.environ["MY_HOST_DB"]
 
 myclient = MongoClient(DBSOURCEFINAL, connect=False) 
 db = myclient.get_database("twitter")
 records = db.data
+
+
+def connectUser(us_id, us_id_str, us_name, us_screen_name, us_location, us_url, us_description, us_protected,
+                        us_verified, us_followers_count, us_friends_count, us_listed_count,
+                        us_favourites_count, us_statuses_count, us_created_at, us_utc_offset,
+                        us_time_zone, us_profile_background_color, us_profile_background_image_url,
+                        us_profile_background_image_url_https, us_profile_background_tile):
+    """
+    connect to MySQL database and insert twitter data
+    """
+    try:
+        con = mysql.connector.connect(host=HOST_DB,
+                                      database='tweepy', user=USER_DB, password=PASS_DB, charset='utf8')
+        if con.is_connected():
+            """
+            Insert twitter data
+            """
+            cursor = con.cursor()
+            # twitter, golf
+            cursor.execute('SET NAMES utf8mb4')
+            cursor.execute("SET CHARACTER SET utf8mb4")
+            cursor.execute("SET character_set_connection=utf8mb4")
+
+
+            #aGregar codigo insertar mysql
+
+
+            con.commit()
+    except Error as e:
+        print(e)
+    cursor.close()
+    con.close()
+    return
+
 
 class TweetsListener(tweepy.StreamListener):
     def on_connect(self):
