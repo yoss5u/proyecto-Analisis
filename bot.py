@@ -44,7 +44,16 @@ def connectUser(us_id, us_id_str, us_name, us_screen_name, us_location, us_url, 
 
 
             #aGregar codigo insertar mysql
-
+            query = "INSERT INTO tweet (created_at, id, id_str, usuario_id, text, source, truncated, " \
+                    "in_reply_to_status_id, in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, " \
+                    "in_reply_to_screen_name, geo, coordinates, place, contributors, is_quote_status, quote_count," \
+                    " reply_count, retweet_count, favorite_count, filter_level," \
+                    " lang, timestamp_ms) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+                    "%s, %s, %s, %s, %s, %s, %s, %s) "
+            cursor.execute(query, (created_at, id, id_str, usario_id, text, source, truncated, in_reply_to_status_id,
+                                   in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, in_reply_to_screen_name,
+                                   geo, coordinates, place, contributors, is_quote_status, quote_count, reply_count, retweet_count,
+                                   favorite_count, filter_level, lang, timestamp_ms))
 
             con.commit()
     except Error as e:
@@ -63,6 +72,12 @@ class TweetsListener(tweepy.StreamListener):
             print(type(status))
             print(type(status._json))
             print(f'{status.text} - {status.user.name} - {status.user.screen_name} - {status.user.location}')
+            connectUser(status.user.id, status.user.id_str, status.user.name, status.user.screen_name,
+                        status.user.location, status.user.url, status.user.description, status.user.protected,
+                        status.user.verified, status.user.followers_count, status.user.friends_count, status.user.listed_count,
+                        status.user.favourites_count, status.user.statuses_count, status.user.created_at, status.user.utc_offset,
+                        status.user.time_zone, status.user.profile_background_color, status.user.profile_background_image_url,
+                        status.user.profile_background_image_url_https, status.user.profile_background_tile)
             with open('data.json', 'w') as file:
                 json.dump(status._json, file, indent=4)
             with open('data.json') as file: 
