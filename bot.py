@@ -62,6 +62,38 @@ def connectUser(us_id, us_id_str, us_name, us_screen_name, us_location, us_url, 
     con.close()
     return
 
+def connectTweet(created_at, id, id_str, usario_id, text, source, truncated, in_reply_to_status_id, in_reply_to_status_id_str,
+                 in_reply_to_user_id, in_reply_to_user_id_str, in_reply_to_screen_name, geo, coordinates, place, contributors,
+                 is_quote_status, quote_count, reply_count, retweet_count, favorite_count, filter_level, lang, timestamp_ms):
+    """
+    connect to MySQL database and insert twitter data
+    """
+    try:
+        con = mysql.connector.connect(host=HOST_DB, database='tweepy', user=USER_DB, password=PASS_DB,
+                                      charset='utf8')
+        if con.is_connected():
+            """
+            Insert twitter data
+            """
+            cursor = con.cursor()
+            # twitter, golf
+
+            query = "INSERT INTO tweet (created_at, id, id_str, usuario_id, text, source, truncated, " \
+                    "in_reply_to_status_id, in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, " \
+                    "in_reply_to_screen_name, geo, coordinates, place, contributors, is_quote_status, quote_count," \
+                    " reply_count, retweet_count, favorite_count, filter_level," \
+                    " lang, timestamp_ms) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+                    "%s, %s, %s, %s, %s, %s, %s, %s) "
+            cursor.execute(query, (created_at, id, id_str, usario_id, text, source, truncated, in_reply_to_status_id,
+                                   in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, in_reply_to_screen_name,
+                                   geo, coordinates, place, contributors, is_quote_status, quote_count, reply_count, retweet_count,
+                                   favorite_count, filter_level, lang, timestamp_ms))
+            con.commit()
+    except Error as e:
+        print(e)
+    cursor.close()
+    con.close()
+    return
 
 class TweetsListener(tweepy.StreamListener):
     def on_connect(self):
@@ -99,5 +131,5 @@ def run():
     streamingApi = tweepy.Stream(auth=_apiTwitter.auth, listener=_streamClass)
     streamingApi.filter(follow=['2754746065'])
 
-if name == "main":
+if __name__ == "main":
     run()
