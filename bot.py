@@ -18,7 +18,7 @@ HOST_DB = _os.environ["MY_HOST_DB"]
 
 myclient = MongoClient(DBSOURCEFINAL, connect=False) 
 db = myclient.get_database("twitter")
-records = db.data
+records = db.data 
 
 
 def connectUser(us_id, us_id_str, us_name, us_screen_name, us_location, us_url, us_description, us_protected,
@@ -44,16 +44,17 @@ def connectUser(us_id, us_id_str, us_name, us_screen_name, us_location, us_url, 
 
 
             #aGregar codigo insertar mysql
-            query = "INSERT INTO tweet (created_at, id, id_str, usuario_id, text, source, truncated, " \
-                    "in_reply_to_status_id, in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, " \
-                    "in_reply_to_screen_name, geo, coordinates, place, contributors, is_quote_status, quote_count," \
-                    " reply_count, retweet_count, favorite_count, filter_level," \
-                    " lang, timestamp_ms) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
-                    "%s, %s, %s, %s, %s, %s, %s, %s) "
-            cursor.execute(query, (created_at, id, id_str, usario_id, text, source, truncated, in_reply_to_status_id,
-                                   in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, in_reply_to_screen_name,
-                                   geo, coordinates, place, contributors, is_quote_status, quote_count, reply_count, retweet_count,
-                                   favorite_count, filter_level, lang, timestamp_ms))
+            query = "INSERT INTO usuario (id, id_str, name, screen_name, location, url, description, " \
+                    "protected, verified, followers_count, friends_count, " \
+                    "listed_count, favourites_count, statuses_count, created_at, " \
+                    "utc_offset, time_zone, profile_background_color, " \
+                    "profile_background_image_url, profile_background_image_url_https, profile_background_tile) VALUES" \
+                    " (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(query, (us_id, us_id_str, us_name, us_screen_name, us_location, us_url, us_description,
+                                   us_protected, us_verified, us_followers_count, us_friends_count,
+                                   us_listed_count, us_favourites_count, us_statuses_count, us_created_at, us_utc_offset,
+                                   us_time_zone, us_profile_background_color, us_profile_background_image_url,
+                                   us_profile_background_image_url_https, us_profile_background_tile))                   
 
             con.commit()
     except Error as e:
@@ -76,7 +77,9 @@ def connectTweet(created_at, id, id_str, usario_id, text, source, truncated, in_
             Insert twitter data
             """
             cursor = con.cursor()
-            # twitter, golf
+            cursor.execute('SET NAMES utf8mb4')
+            cursor.execute("SET CHARACTER SET utf8mb4")
+            cursor.execute("SET character_set_connection=utf8mb4")
 
             query = "INSERT INTO tweet (created_at, id, id_str, usuario_id, text, source, truncated, " \
                     "in_reply_to_status_id, in_reply_to_status_id_str, in_reply_to_user_id, in_reply_to_user_id_str, " \
@@ -110,9 +113,16 @@ class TweetsListener(tweepy.StreamListener):
                         status.user.favourites_count, status.user.statuses_count, status.user.created_at, status.user.utc_offset,
                         status.user.time_zone, status.user.profile_background_color, status.user.profile_background_image_url,
                         status.user.profile_background_image_url_https, status.user.profile_background_tile)
+            
+            connectTweet(status.created_at, status.id, status.id_str, status.user.id, status.text, status.source, status.truncated,
+                         status.in_reply_to_status_id, status.in_reply_to_status_id_str, status.in_reply_to_user_id, status.in_reply_to_user_id_str,
+                         status.in_reply_to_screen_name, status.geo, status.coordinates, status.place, status.contributors, status.is_quote_status,
+                         status.quote_count, status.reply_count, status.retweet_count, status.favorite_count, status.filter_level, status.lang,
+                         status.timestamp_ms)                        
+
             with open('data.json', 'w') as file:
                 json.dump(status._json, file, indent=4)
-            with open('data.json') as file: 
+            with open('data.json') as file:                            
                 file_data = json.load(file) 
                 records.insert_one(file_data) 
 
