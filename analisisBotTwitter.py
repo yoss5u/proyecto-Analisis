@@ -30,7 +30,27 @@ class informationGraphs():
         #Obtiene datos estadisticos del DataFrame
         describeInfo = self.dataFrameIbai.describe()
 
-    
+    def dynamicGraph(self):
+        groupBySource = self.dataFrameIbai.groupby('date')['_id'].count().to_dict()
+        print((groupBySource))
+        plt.axis([0, 49, 0, 20000])
+        plt.xticks(rotation=45, visible=True)
+        plt.ion()
+
+        xs = [0, 0]
+        ys = [0, 0]
+        x = 0
+        for i in groupBySource:
+            y = groupBySource[i]
+            xs[0] = xs[1]
+            ys[0] = ys[1]
+            xs[1] = i
+            ys[1] = y
+            plt.plot(xs, ys)
+            plt.pause(0.1)
+            x += 1
+            print(x)
+
     def graphByLenaguage(self):
         categoricalVariables = ['lenguage']
         for catVar in categoricalVariables:
