@@ -65,3 +65,60 @@ class informationGraphs():
         ax.set_ylabel("Source", labelpad=20, weight='bold', size=12)
         # Plot
         plt.show()
+
+
+    def mapHeat(self):
+        data = self.dataFrameIbai
+        data['user_created_profile'] = pd.to_datetime(data['user_created_profile'], format='%d-%m-%Y')
+        data['day'] = data['user_created_profile'].dt.day
+        data['month'] = data['user_created_profile'].dt.month
+        data['year'] = data['user_created_profile'].dt.year
+        df = data.groupby(['year', 'month']).size().to_frame('count').sort_values(['count'], ascending=False).reset_index()
+        print(df)
+        pivot = df.pivot(index='year', columns='month', values='count')
+        sns.set()
+        ax = sns.heatmap(pivot)
+        plt.xticks(rotation=-90)
+        plt.show()
+        
+
+    def showWords(self):
+        data = self.dataFrameIbai
+        data_head = data.head(20)
+        print(data_head)
+        text = " ".join(review for review in data.text_tweet)
+        print("There are {} words in the combination of all review.".format(len(text)))
+        stopwords = set(STOPWORDS)
+        stopwords.update(["IbaiLlanos", "https", "t", "co", "y"])
+        wordcloud = WordCloud(stopwords=stopwords, background_color="white", width=1500, height=1200).generate(text)
+
+        # Display the generated image:
+        # the matplotlib way:
+        plt.figure(figsize=(20, 9))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis("off")
+        plt.show()
+
+
+class pandasModel(QAbstractTableModel):
+
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
+
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
+
+    def columnCount(self, parnet=None):
+        return self._data.shape[1]
+
+    def data(self, index, role=Qt.DisplayRole):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
