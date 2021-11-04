@@ -102,6 +102,26 @@ class informationGraphs():
         plt.show()
         
 
+    def comparationLenguage(self):
+        df = self.dataFrameIbai.groupby(['source']).size().to_frame('Total_Ibai').sort_values(['Total_Ibai'], ascending=False).head(10).reset_index()
+        df2 = self.dataFrameElon.groupby(['source']).size().to_frame('Total_Elon').sort_values(['Total_Elon'], ascending=False).head(10).reset_index()
+        df3 = pd.merge(df, df2, on='source')
+
+        df3.plot.bar(x='source')
+        plt.xticks(rotation=0)
+        plt.legend()
+        plt.show()
+
+    def comparationCountry(self):
+        df = self.dataFrameIbai.groupby(['lenguage']).size().to_frame('Total_Ibai').sort_values(['Total_Ibai'], ascending=False).head(10).reset_index()
+        df2 = self.dataFrameElon.groupby(['lenguage']).size().to_frame('Total_Elon').sort_values(['Total_Elon'], ascending=False).head(10).reset_index()
+        df3 = pd.merge(df, df2, on='lenguage')
+
+        df3.plot.bar(x='lenguage')
+        plt.xticks(rotation=0)
+        plt.legend()
+        plt.show()
+
     def showWords(self):
         data = self.dataFrameIbai
         data_head = data.head(20)
